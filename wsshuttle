@@ -1,7 +1,10 @@
 #!/bin/bash
 
 usage(){
-    echo "${0##*/} [--delete] [--dry] [--version] <sshuttle_options...>"
+    echo -n "${0##*/}"
+    echo -n ' [--delete] [--dry] [--upgrade] [--version]'
+    echo -n ' <sshuttle_options...>'
+    echo
 }
 #usage;exit
 
@@ -143,6 +146,11 @@ main(){
         exit 0
     elif [[ "$*" =~ --version ]];  then
         echo 0.0.1
+        exit 0
+    elif [[ "$*" =~ --upgrade ]];  then
+        url=https://raw.githubusercontent.com/yabeenico/wsshuttle/main/wsshuttle
+        wget $url -O "$0"
+        chmod +x "$0"
         exit 0
     elif [[ ! "$*" =~ -r ]]; then
         echo error: -r is required
