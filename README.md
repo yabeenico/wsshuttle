@@ -18,7 +18,7 @@ wsshuttle [--delete] [--dry] [--upgrade] <sshuttle_options...>
 ```
 
 # Examples
-Admin privilege of Windows is required.
+Admin privilege of Windows is required.  
 -x "IP address of ssh-server" can be omitted because it's automatically added.
 
 ```bash
