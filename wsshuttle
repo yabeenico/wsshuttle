@@ -149,8 +149,8 @@ main(){
         exit 0
     elif [[ "$*" =~ --upgrade ]];  then
         url=https://raw.githubusercontent.com/yabeenico/wsshuttle/main/wsshuttle
-        wget $url -O "$0"
-        chmod +x "$0"
+        (echo wget $url -O "'$0'"; echo chmod +x "'$0'") |
+        ([[ "$*" =~ --dry ]] && cat || bash)
         exit 0
     elif [[ ! "$*" =~ -r ]]; then
         echo error: -r is required
