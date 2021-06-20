@@ -7,8 +7,8 @@ the terminal of WSL2 is required admin privilege of Windows.
 
 # Requirements
 - ipcalc
-- bash > 4.0
-- sshuttle > 1.0.5
+- bash >= 4.0
+- sshuttle >= 1.0.5
 
 # Installation
 ```bash
