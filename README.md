@@ -1,8 +1,9 @@
 
 # Description
-Run sshuttle from WSL2, and setup routing table of Windows.
-Because it modifies routing table of Windows, the terminal of WSL2 is required
-admin privilege of Windows.  (Open WSL2 terminal with "Run as Administrator")
+Run sshuttle from WSL2, and setup routing table of Windows.  
+Because it modifies routing table of Windows,
+the terminal of WSL2 is required admin privilege of Windows.  
+(Open WSL2 terminal with "Run as Administrator")
 
 # Installation
 ```bash
@@ -24,14 +25,15 @@ Admin privilege of Windows is required.
 wsshuttle -r ssh-server -x 157.0.0.0/8 0/0
 ```
 
-Delete routing table.
+Deletes routing table.  
 Routing table is reset when wsshuttle exits, if you hava any problem, do it.
 
 ```bash
 wsshuttle -r ssh-server -x 157.0.0.0/8 0/0 --delete
 ```
 
-Dry-run, only prints commands. Doesn't make any changes.
+Dry-run, only prints commands.  
+Doesn't make any changes.
 
 ```bash
 wsshuttle -r ssh-server -x 157.0.0.0/8 0/0 --dry
