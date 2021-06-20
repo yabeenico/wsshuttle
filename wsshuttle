@@ -1,0 +1,182 @@
+#!/bin/bash
+
+usage(){
+    echo "${0##*/} [--delete] [--dry] <sshuttle_options...>"
+}
+#usage;exit
+
+show(){
+    for rxs in "$@"; do
+        eval echo '${'$rxs'[@]}' |
+        xargs -n1 echo $rxs: |
+        cat
+    done
+}
+#r=aa; x=(bb cc); s=(dd ee); show r x s; exit
+
+parse_args(){
+    args=()
+    for i in "$@"; do
+        if [[ $i = --delete ]]; then
+            IS_DELETE=1
+        elif [[ $i = --dry ]]; then
+            IS_DRY=1
+        else
+            args+=("$i")
+        fi
+    done
+    #echo IS_DELETE: ,$IS_DELETE,;echo IS_DRY: ,$IS_DRY,;exit
+    #for i in "${args[@]}"; do echo $i;done;exit
+
+    for((i = 1; i < ${#args[@]}; i++)); do
+        if [[ ${args[$i-1]} =~ ^-[^-]*r$ ]]; then # -r
+            ssh=$(ssh -v ${args[$i]} true 2>&1) &&
+            break || { echo error: ssh failed; exit 1; }
+        fi
+    done
+    #echo "$ssh";exit
+
+    ruser=$(echo "$ssh" | grep 'Authenticating' | awk -F\'     '$0=$2')
+    rip=$(  echo "$ssh" | grep 'Authenticated'  | awk -F'[][]' '$0=$2')
+    rport=$(echo "$ssh" | grep 'Authenticated'  | awk -F'[])]' '$0=$2')
+    args[$i]=$ruser@$rip$rport
+
+    #show args;exit
+}
+
+set_xs(){
+    x=($rip); s=()
+    for((i = 1; i < ${#args[@]}; i++)); do
+        if [[ ${args[$i-1]} =~ ^-[^-]*x$ ]]; then # -x
+            x+=("${args[$i]}")
+        elif [[ ! ${args[$i-1]} =~ ^-[^-]*[elr] ]]; then # not -e -l -r
+            if [[ ${args[$i]} =~ ^[0-9] ]]; then
+                s+=("${args[$i]}")
+            fi
+        fi
+    done
+    #show x s;exit # 8.8.8.8[/24]
+
+    f() {
+        for i in "$@"; do # 8.8.8.8[/24]
+            ipcalc "$i" 32 | # 8.8.8.8[/24] 32
+            awk '
+                $1=="Netmask:"{mask=$2}
+                $1=="Address:"{addr=$2}
+                $1=="Network:"{addr=substr($2, 0, index($2, "/") - 1)}
+                $0==""{exit}
+                END{print addr "/" mask}
+            ' |
+            cat
+        done
+    }
+    x=( $(f "${x[@]}") )
+    s=( $(f "${s[@]}") )
+    #show x s; exit  # 8.8.8.0/255.255.255.0
+
+    s=($(
+        echo "${s[@]}" |
+        sed 's,0.0.0.0/0.0.0.0,0.0.0.0/128.0.0.0 128.0.0.0/128.0.0.0,g'
+    ))
+    #show s; exit
+
+    x=( $(echo "${x[@]}" | xargs -n1 | sort -u) )
+    s=( $(echo "${s[@]}" | xargs -n1 | sort -u) )
+    #show x s; exit # uniq
+
+    #show x s; exit
+}
+
+set_env(){
+    WSL2_IP=$(hostname -I)
+
+    WIN_VIFIP=$(ip r s default | cut -d' ' -f3)
+    WIN_VIFID=$(arp.exe -a | grep "^I.*: $WIN_VIFIP" | awk '$0=strtonum($4)')
+
+    GW_IP=$(route.exe print -4 | awk '$1=="0.0.0.0"{print $3}')
+
+    WIN_IFIP=$(route.exe print -4 | awk '$1=="0.0.0.0"{print $4}')
+    WIN_IFID=$( arp.exe -a | grep "^I.*: $WIN_IFIP"  | awk '$0=strtonum($4)')
+
+    #echo WSL2_IP:   $WSL2_IP
+    #echo WIN_VIFID: $WIN_VIFID
+    #echo GW_IP:     $GW_IP
+    #echo WIN_IFID:  $WIN_IFID
+    #exit
+}
+
+route_add(){
+    for i in "${x[@]}"; do
+        addr=${i%%/*}
+        mask=${i##*/}
+        echo route.exe add $addr mask $mask $GW_IP   metric 1 if $WIN_IFID
+    done
+
+    for i in "${s[@]}"; do
+        addr=${i%%/*}
+        mask=${i##*/}
+        echo route.exe add $addr mask $mask $WSL2_IP metric 1 if $WIN_VIFID
+    done
+}
+
+route_del(){
+    for i in "${x[@]}"; do
+        addr=${i%%/*}
+        mask=${i##*/}
+        echo route.exe delete $addr mask $mask
+    done
+
+    for i in "${s[@]}"; do
+        addr=${i%%/*}
+        mask=${i##*/}
+        echo route.exe delete $addr mask $mask
+    done
+}
+
+sshuttle_cmd(){
+    echo sshuttle -l 0.0.0.0:0 -x $rip "${args[@]}"
+}
+
+main(){
+    if [[ "$*" =~ --help ]];  then
+        usage
+        exit 0
+    elif [[ "$*" =~ --version ]];  then
+        echo 0.0.1
+        exit 0
+    elif [[ ! "$*" =~ -r ]]; then
+        echo error: -r is required
+        usage
+        exit 1
+    fi
+
+    set_env
+    parse_args "$@" # args, rip, IS_DELETE, IS_DRY
+    set_xs          # x, s
+
+    if [[ $IS_DELETE = 1 ]]; then
+        if [[ $IS_DRY = 1 ]]; then
+            route_del | column -t
+        else
+            route_del | powershell.exe -NonInteractive -NoProfile -
+        fi
+    else
+        if [[ $IS_DRY = 1 ]]; then
+            (route_del; route_add) | column -t
+            sshuttle_cmd
+            route_del | column -t
+        else
+            route_del | powershell.exe -NonInteractive -NoProfile - &>/dev/null
+            route_add | powershell.exe -NonInteractive -NoProfile - | grep -v OK
+            if [[ $? != 0 ]]; then # if route.exe add success
+                sshuttle_cmd
+                sshuttle_cmd | bash
+                route_del | powershell.exe -NonInteractive -NoProfile - |
+                grep -v OK
+            fi
+        fi
+    fi
+}
+
+main "$@"
+
