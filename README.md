@@ -21,7 +21,7 @@ sudo chmod +x /usr/local/bin/wsshuttle
 # Usage
 ```bash
 wsshuttle --help
-wsshuttle [--delete] [--dry] [--upgrade] <sshuttle_options...>
+wsshuttle [--delete] [--dry] [--version] <sshuttle_options...>
 ```
 
 # Examples
