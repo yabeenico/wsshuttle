@@ -42,7 +42,7 @@ parse_args(){
     ruser=$(echo "$ssh" | grep 'Authenticating' | awk -F\'     '$0=$2')
     rip=$(  echo "$ssh" | grep 'Authenticated'  | awk -F'[][]' '$0=$2')
     rport=$(echo "$ssh" | grep 'Authenticated'  | awk -F'[])]' '$0=$2')
-    args[$i]=$ruser@$rip$rport
+    #args[$i]=$ruser@$rip$rport
 
     #show args;exit
 }
@@ -145,14 +145,14 @@ main(){
         usage
         exit 0
     elif [[ "$*" =~ --version ]];  then
-        echo 0.0.1
+        echo 0.0.2
         exit 0
     elif [[ "$*" =~ --upgrade ]];  then
         url=https://raw.githubusercontent.com/yabeenico/wsshuttle/main/wsshuttle
         (echo wget $url -O "'$0'"; echo chmod +x "'$0'") |
         ([[ "$*" =~ --dry ]] && cat || bash)
         exit 0
-    elif [[ ! "$*" =~ -r ]]; then
+    elif [[ ! "$*" =~ ' '-[^- ]*r ]]; then
         echo error: -r is required
         usage
         exit 1
