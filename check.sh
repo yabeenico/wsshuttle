@@ -14,9 +14,9 @@ column -t
 
 echo
 cat<<'EOF'
-wsshuttle -r server -x $(dig +short inet-ip.info) $(dig +short ipconfig.me) 0/0
+wsshuttle -r server -x $(dig +short inet-ip.info) $(dig +short ifconfig.me) 0/0
 ifconfig.me == ifconfig.io
 
-wsshuttle -r server -x $(dig +short inet-ip.info) $(dig +short ipconfig.me)
+wsshuttle -r server -x $(dig +short inet-ip.info) $(dig +short ifconfig.me)
 inet-ip.info == ifconfig.io
 EOF
