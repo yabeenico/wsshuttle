@@ -146,7 +146,7 @@ main(){
         usage
         exit 0
     elif [[ "$*" =~ --version ]];  then
-        echo 0.0.2
+        echo 0.0.3
         exit 0
     elif [[ "$*" =~ --upgrade ]];  then
         url=https://raw.githubusercontent.com/yabeenico/wsshuttle/main/wsshuttle
