@@ -52,7 +52,7 @@ route.exe add    157.0.0.0 mask 255.0.0.0       192.168.3.1    metric 1 if 7
 route.exe add    3.3.3.3   mask 255.255.255.255 192.168.3.1    metric 1 if 7
 route.exe add    0.0.0.0   mask 128.0.0.0       172.18.187.223 metric 1 if 46
 route.exe add    128.0.0.0 mask 128.0.0.0       172.18.187.223 metric 1 if 46
-sshuttle -l 0.0.0.0:0 -x 3.3.3.3 -r user@3.3.3.3:22 -x 157.0.0.0/8 0/0
+sshuttle -l 0.0.0.0:0 -x 3.3.3.3 -r ssh-server -x 157.0.0.0/8 0/0
 route.exe delete 157.0.0.0 mask 255.0.0.0
 route.exe delete 3.3.3.3   mask 255.255.255.255
 route.exe delete 0.0.0.0   mask 128.0.0.0
