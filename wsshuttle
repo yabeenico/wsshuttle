@@ -14,6 +14,7 @@ show(){
         xargs -n1 echo $rxs: |
         cat
     done
+    exit 0
 }
 #r=aa; x=(bb cc); s=(dd ee); show r x s; exit
 
@@ -28,23 +29,27 @@ parse_args(){
             args+=("$i")
         fi
     done
-    #echo IS_DELETE: ,$IS_DELETE,;echo IS_DRY: ,$IS_DRY,;exit
-    #for i in "${args[@]}"; do echo $i;done;exit
+    #show IS_DELETE IS_DRY args
 
     for((i = 1; i < ${#args[@]}; i++)); do
         if [[ ${args[$i-1]} =~ ^-[^-]*r$ ]]; then # -r
-            ssh=$(ssh -v ${args[$i]} true 2>&1) &&
-            break || { echo error: ssh failed; exit 1; }
+            rhost=${args[$i]}
+            break
+            #ssh=$(ssh -v ${args[$i]} true 2>&1) &&
+            #break || { echo error: ssh failed; exit 1; }
         fi
     done
     #echo "$ssh";exit
+    #show rhost
 
-    ruser=$(echo "$ssh" | grep 'Authenticating' | awk -F\'     '$0=$2')
-    rip=$(  echo "$ssh" | grep 'Authenticated'  | awk -F'[][]' '$0=$2')
-    rport=$(echo "$ssh" | grep 'Authenticated'  | awk -F'[])]' '$0=$2')
-    #args[$i]=$ruser@$rip$rport
-
-    #show args;exit
+    while [[ ! -z $rhost ]]; do
+        ssh=$(ssh -v $rhost true 2>&1 | tr -d '\r') ||
+        { echo error: ssh $rhost failed; exit 1; }
+        rhost=$(echo "$ssh" |  awk '/Executing proxy command:/{print $(NF)}')
+    done
+    rhost=$(echo "$ssh" | awk -F'[][]' '/Authenticated/{print $2}')
+    rip=$(dig +short $rhost | head -n1)
+    #show rhost rip
 }
 
 set_xs(){
@@ -58,7 +63,7 @@ set_xs(){
             fi
         fi
     done
-    #show x s;exit # 8.8.8.8[/24]
+    #show x s # 8.8.8.8[/24]
 
     f() {
         for i in "$@"; do # 8.8.8.8[/24]
@@ -75,19 +80,19 @@ set_xs(){
     }
     x=( $(f "${x[@]}") )
     s=( $(f "${s[@]}") )
-    #show x s; exit  # 8.8.8.0/255.255.255.0
+    #show x s # 8.8.8.0/255.255.255.0
 
     s=($(
         echo "${s[@]}" |
         sed 's,0.0.0.0/0.0.0.0,0.0.0.0/128.0.0.0 128.0.0.0/128.0.0.0,g'
     ))
-    #show s; exit
+    #show s
 
     x=( $(echo "${x[@]}" | xargs -n1 | sort -u) )
     s=( $(echo "${s[@]}" | xargs -n1 | sort -u) )
-    #show x s; exit # uniq
+    #show x s # uniq
 
-    #show x s; exit
+    #show x s
 }
 
 set_env(){
@@ -101,11 +106,7 @@ set_env(){
     WIN_IFIP=$(route.exe print -4 | awk '$1=="0.0.0.0"{print $4}')
     WIN_IFID=$( arp.exe -a | grep "^I.*: $WIN_IFIP"  | awk '$0=strtonum($4)')
 
-    #echo WSL2_IP:   $WSL2_IP
-    #echo WIN_VIFID: $WIN_VIFID
-    #echo GW_IP:     $GW_IP
-    #echo WIN_IFID:  $WIN_IFID
-    #exit
+    #show WSL2_IP WIN_VIFID GW_IP WIN_IFID
 }
 
 route_add(){
