@@ -152,7 +152,7 @@ main(){
         (echo wget $url -O "'$0'"; echo chmod +x "'$0'") |
         ([[ "$*" =~ --dry ]] && cat || bash)
         exit 0
-    elif [[ ! "$*" =~ ' '-[^- ]*r ]]; then
+    elif [[ ! " $*" =~ \ -[^\ -]*r ]]; then
         echo error: -r is required
         usage
         exit 1
