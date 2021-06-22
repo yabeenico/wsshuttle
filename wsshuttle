@@ -33,19 +33,27 @@ parse_args(){
 
     for((i = 1; i < ${#args[@]}; i++)); do
         if [[ ${args[$i-1]} =~ ^-[^-]*r$ ]]; then # -r
-            rhost=${args[$i]}
+            ssh=$(ssh -v ${args[$i]} true 2>&1 | tr -d '\r' | tr -s ' ')
             break
             #ssh=$(ssh -v ${args[$i]} true 2>&1) &&
             #break || { echo error: ssh failed; exit 1; }
         fi
     done
     #echo "$ssh";exit
-    #show rhost
+    #show pc
 
-    while [[ ! -z $rhost ]]; do
-        ssh=$(ssh -v $rhost true 2>&1 | tr -d '\r') ||
-        { echo error: ssh $rhost failed; exit 1; }
-        rhost=$(echo "$ssh" |  awk '/Executing proxy command:/{print $(NF)}')
+    while true; do
+        pc=$(
+            echo "$ssh" |
+            grep 'Executing proxy command:' |
+            cut -d' ' -f6- |
+            perl -pe 's/^(ssh.* -[^- ]*)W [^ ]+/\1v/' | # -W %h:%p -> -v
+            cat
+        )
+        #echo ,$pc,
+        [[ -z $pc ]] && break
+        ssh=$($pc true 2>&1 | tr -d '\r' | tr -s ' ') ||
+        { echo error: $pc failed; exit 1; }
     done
     rhost=$(echo "$ssh" | awk -F'[][]' '/Authenticated/{print $2}')
     rip=$(dig +short $rhost | head -n1)
