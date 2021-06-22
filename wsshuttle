@@ -35,12 +35,11 @@ parse_args(){
         if [[ ${args[$i-1]} =~ ^-[^-]*r$ ]]; then # -r
             ssh=$(ssh -v ${args[$i]} true 2>&1 | tr -d '\r' | tr -s ' ')
             break
-            #ssh=$(ssh -v ${args[$i]} true 2>&1) &&
-            #break || { echo error: ssh failed; exit 1; }
         fi
     done
     #echo "$ssh";exit
-    #show pc
+
+    [[ $i = ${#args[@]} ]] && rip= && return
 
     while true; do
         pc=$(
@@ -161,10 +160,6 @@ main(){
         (echo wget $url -O "'$0'"; echo chmod +x "'$0'") |
         ([[ "$*" =~ --dry ]] && cat || bash)
         exit 0
-    elif [[ ! " $*" =~ \ -[^\ -]*r ]]; then
-        echo error: -r is required
-        usage
-        exit 1
     fi
 
     set_env
