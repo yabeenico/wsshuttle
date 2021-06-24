@@ -181,10 +181,14 @@ main(){
             route_del | powershell.exe -NonInteractive -NoProfile - &>/dev/null
             route_add | powershell.exe -NonInteractive -NoProfile - | grep -v OK
             if [[ $? != 0 ]]; then # if route.exe add success
+                trap '
+                    route_del |
+                    powershell.exe -NonInteractive -NoProfile - |
+                    grep -v OK
+                ' 1 2 3 15
                 sshuttle_cmd
                 sshuttle_cmd | bash
-                route_del | powershell.exe -NonInteractive -NoProfile - |
-                grep -v OK
+                kill $$
             fi
         fi
     fi
