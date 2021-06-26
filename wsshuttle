@@ -187,8 +187,7 @@ main(){
                     grep -v OK
                 ' 1 2 3 15
                 sshuttle_cmd
-                sshuttle_cmd | bash
-                kill $$
+                sshuttle_cmd | bash && kill $$
             fi
         fi
     fi
