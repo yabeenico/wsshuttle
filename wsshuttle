@@ -145,7 +145,7 @@ route_del(){
 }
 
 sshuttle_cmd(){
-    echo sshuttle -l 0.0.0.0:0 -x $rip "${args[@]}"
+    echo sshuttle -l 0.0.0.0:0 "${args[@]}" -x $rip
 }
 
 main(){
@@ -185,9 +185,11 @@ main(){
                     route_del |
                     powershell.exe -NonInteractive -NoProfile - |
                     grep -v OK
+                    exit
                 ' 1 2 3 15
                 sshuttle_cmd
-                sshuttle_cmd | bash && kill $$
+                sshuttle_cmd | bash
+                kill $$
             fi
         fi
     fi
