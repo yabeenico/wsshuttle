@@ -20,7 +20,7 @@ help(){
     --version:      Show version.
 EOF
 }
-help;exit
+#help;exit
 
 show(){
     for rxs in "$@"; do
@@ -39,11 +39,15 @@ parse_args(){
             IS_DELETE=1
         elif [[ $i = --dry ]]; then
             IS_DRY=1
+        elif [[ $i = --noresolve ]]; then
+            IS_NORESOLVE=1
         else
             args+=("$i")
         fi
     done
-    #show IS_DELETE IS_DRY args
+    #show IS_DELETE IS_DRY IS_NORESOLVE args
+
+    [[ $IS_NORESOLVE = 1 ]] && return
 
     for((i = 1; i < ${#args[@]}; i++)); do
         if [[ ${args[$i-1]} =~ ^-[^-]*r$ ]]; then # -r
@@ -53,7 +57,7 @@ parse_args(){
     done
     #echo "$ssh";exit
 
-    [[ $i = ${#args[@]} ]] && rip= && return
+    [[ $i = ${#args[@]} ]] && return
 
     while true; do
         pc=$(
