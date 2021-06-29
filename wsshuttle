@@ -9,8 +9,16 @@ usage(){
 #usage;exit
 
 help(){
+    echo USAGE
+    echo -n '    '
     usage
     cat<<EOF
+DESCRIPTION
+    It runs sshuttle from WSL2, and sets up the routing table of Windows.
+    Since it modifies the routing table of Windows,
+    the admin privilege of Windows is required.
+    (Open WSL2 terminal with "Run as Administrator")
+OPTIONS
     --delete:       Delete the entries of routing table.
     --dry:          Just print commands to run, don't make any changes.
     --help:         Show this help.
@@ -18,6 +26,17 @@ help(){
                     and don't add the rule of -x of the host.
     --upgrade:      Update this program.
     --version:      Show version.
+EXAMPLES
+    wsshuttle -r ssh-server -x 157.0.0.0/8 0/0
+        Route all (0/0) packets through ssh-server except destination is
+        157.0.0.0/8. And it excludes 'IP address of ssh-server' too by
+        specifying -x 'IP address of ssh-server' automatically.
+    wsshuttle -r ssh-server -x 157.0.0.0/8 0/0 --noresolve
+        Disables the feature of auto specifying -x 'IP address of ssh-server'.
+    wsshuttle -r ssh-server -x 157.0.0.0/8 0/0 --delete
+        Deletes the entries of the routing table.
+    wsshuttle -r ssh-server -x 157.0.0.0/8 0/0 --dry
+        Dry-run, just print commands to run, doesn't make any changes.
 EOF
 }
 #help;exit
@@ -163,7 +182,7 @@ route_del(){
 }
 
 sshuttle_cmd(){
-    echo sshuttle -l 0.0.0.0:0 "${args[@]}" -x $rip
+    echo sshuttle -l 0.0.0.0:0 "${args[@]}" ${rip:+-x $rip}
 }
 
 main(){

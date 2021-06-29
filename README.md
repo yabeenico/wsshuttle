@@ -1,9 +1,9 @@
 
 # Description
-Run sshuttle from WSL2, and setup routing table of Windows.  
-Because it modifies routing table of Windows,
-the terminal of WSL2 is required admin privilege of Windows.  
-(Open WSL2 terminal with "Run as Administrator")
+It runs sshuttle from WSL2, and sets up the routing table of Windows.
+Since it modifies the routing table of Windows,
+the admin privilege of Windows is required.
+(Open WSL2 terminal with "Run as Administrator".)
 
 # Requirements
 - ipcalc
@@ -25,11 +25,21 @@ wsshuttle [--delete] [--dry] [--upgrade] [--version] <sshuttle_options...>
 ```
 
 # Examples
-Admin privilege of Windows is required.  
--x "IP address of ssh-server" can be omitted because it's automatically added.
+
+Caution!: Admin privilege of Windows is required.
+
+Route all (0/0) packets through ssh-server except destination is 157.0.0.0/8.  
+And it excludes 'IP address of ssh-server' too by specifying
+-x 'IP address of ssh-server' automatically.
 
 ```bash
 wsshuttle -r ssh-server -x 157.0.0.0/8 0/0
+```
+
+Disables the feature of auto specifying -x 'IP address of ssh-server'.
+
+```bash
+wsshuttle -r ssh-server -x 157.0.0.0/8 0/0 --noresolve
 ```
 
 Deletes routing table.  
@@ -39,7 +49,7 @@ Routing table is reset when wsshuttle exits, if you hava any problem, do it.
 wsshuttle -r ssh-server -x 157.0.0.0/8 0/0 --delete
 ```
 
-Dry-run, only prints commands.  
+Dry-run, just prints commands.  
 Doesn't make any changes.
 
 ```bash
