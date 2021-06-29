@@ -2,11 +2,25 @@
 
 usage(){
     echo -n "${0##*/}"
-    echo -n ' [--delete] [--dry] [--upgrade] [--version]'
+    echo -n ' [--delete] [--dry] [--help] [--noresolve] [--upgrade] [--version]'
     echo -n ' <sshuttle_options...>'
     echo
 }
 #usage;exit
+
+help(){
+    usage
+    cat<<EOF
+    --delete:       Delete the entries of routing table.
+    --dry:          Just print commands to run, don't make any changes.
+    --help:         Show this help.
+    --noresolve:    Don't resolve the IP address of the host specified by -r,
+                    and don't add the rule of -x of the host.
+    --upgrade:      Update this program.
+    --version:      Show version.
+EOF
+}
+help;exit
 
 show(){
     for rxs in "$@"; do
@@ -150,7 +164,7 @@ sshuttle_cmd(){
 
 main(){
     if [[ "$*" =~ --help ]];  then
-        usage
+        help
         exit 0
     elif [[ "$*" =~ --version ]];  then
         echo 0.0.3
