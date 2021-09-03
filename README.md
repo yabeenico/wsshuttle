@@ -43,7 +43,7 @@ wsshuttle -r ssh-server -x 157.0.0.0/8 0/0 --noresolve
 ```
 
 Deletes routing table.  
-Routing table is reset when wsshuttle exits, if you hava any problem, do it.
+Routing table is reset when wsshuttle exits, if you have any problem, do it.
 
 ```bash
 wsshuttle -r ssh-server -x 157.0.0.0/8 0/0 --delete
@@ -69,6 +69,19 @@ route.exe delete 0.0.0.0   mask 128.0.0.0
 route.exe delete 128.0.0.0 mask 128.0.0.0
 ```
 
-# Future Work
-- nothing
+# Recommended Settings
+
+Invoke 'wsshuttle' when hit 'sshuttle'.  
+When not admin, do privilege elevation automatically. ~~
+Installing 'sudo' on PowerShell is required (scoop install sudo)
+
+```bash
+sshuttle(){
+    if net.exe session &>/dev/null; then # if admin
+        $SHELL -ic "wsshuttle $*"
+    else
+        powershell.exe sudo wsl $SHELL -ic \"wsshuttle $*\"
+    fi
+}
+```
 
