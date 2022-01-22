@@ -3,7 +3,7 @@
 usage(){
     echo -n "${0##*/}"
     echo -n ' [--delete] [--dry] [--help] [--upgrade] [--version]'
-    echo -n ' <sshuttle_options...>'
+    echo -n ' <sshuttle_args...>'
     echo
 }
 #usage;exit
@@ -217,10 +217,14 @@ main(){
             if [[ $? != 0 ]]; then # if route.exe add success
                 trap '
                     route_del |
-                    powershell.exe -NonInteractive -NoProfile - |
-                    grep -v OK
+                    powershell.exe -NonInteractive -NoProfile - &>/dev/null &
                     exit
-                ' 1 2 3 15
+                ' 2
+                trap '
+                    route_del |
+                    powershell.exe -NonInteractive -NoProfile - &>/dev/null &
+                    exit 1
+                ' 1 3 15
                 sshuttle_cmd
                 sshuttle_cmd | bash
                 kill $$
