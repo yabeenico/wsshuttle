@@ -38,10 +38,6 @@ wsshuttle -r ssh-server -x 157.0.0.0/8 0/0
 
 Disables the feature of auto specifying -x 'IP address of ssh-server'.
 
-```bash
-wsshuttle -r ssh-server -x 157.0.0.0/8 0/0 --noresolve
-```
-
 Deletes routing table.  
 Routing table is reset when wsshuttle exits, if you have any problem, do it.
 
