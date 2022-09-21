@@ -137,7 +137,7 @@ set_xs(){
 }
 
 set_env(){
-    WSL2_IP=$(hostname -I)
+    WSL2_IP=$(hostname -I | cut -d' ' -f1)
 
     WIN_VIFIP=$(ip r s default | cut -d' ' -f3)
     WIN_VIFID=$(arp.exe -a | grep "^I.*: $WIN_VIFIP" | awk '$0=strtonum($4)')
