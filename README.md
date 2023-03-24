@@ -14,8 +14,7 @@ the admin privilege of Windows is required.
 ```bash
 sudo apt install -y ipcalc
 pip3 install sshuttle==1.0.5 # Other version may cause "doas" error.
-sudo wget https://raw.githubusercontent.com/yabeenico/wsshuttle/main/wsshuttle -O /usr/local/bin/wsshuttle
-sudo chmod +x /usr/local/bin/wsshuttle
+curl https://raw.githubusercontent.com/yabeenico/wsshuttle/main/wsshuttle | sudo install /dev/stdin /usr/local/bin/wsshuttle
 ```
 
 # Usage
