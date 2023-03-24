@@ -179,7 +179,8 @@ route_del(){
 }
 
 sshuttle_cmd(){
-    echo sshuttle -l 0.0.0.0:0 "${args[@]}" ${rip:+-x $rip}
+    printf '%q ' sshuttle -l 0.0.0.0:0 "${args[@]}" ${rip:+-x $rip}
+    echo
 }
 
 main(){
