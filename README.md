@@ -8,12 +8,12 @@ the admin privilege of Windows is required.
 # Requirements
 - ipcalc
 - bash >= 4.0
-- sshuttle == 1.0.5
+- sshuttle == 1.1.1
 
 # Installation
 ```bash
 sudo apt install -y ipcalc
-pip3 install sshuttle==1.0.5 # Other version may cause "doas" error.
+pip3 install sshuttle==1.1.1 # Other version may cause "doas" error.
 curl https://raw.githubusercontent.com/yabeenico/wsshuttle/main/wsshuttle | sudo install /dev/stdin /usr/local/bin/wsshuttle
 ```
 
