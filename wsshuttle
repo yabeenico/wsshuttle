@@ -190,7 +190,7 @@ main(){
         help
         exit 0
     elif [[ "$*" =~ --version ]];  then
-        echo 0.0.6
+        echo 0.0.7
         exit 0
     elif [[ "$*" =~ --upgrade ]];  then
         url=https://raw.githubusercontent.com/yabeenico/wsshuttle/main/wsshuttle
