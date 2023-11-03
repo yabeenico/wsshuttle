@@ -216,7 +216,8 @@ main(){
             route_del | column -t
         else
             route_del | powershell.exe -NonInteractive -NoProfile - &>/dev/null
-            route_add | powershell.exe -NonInteractive -NoProfile - | grep -v OK
+            route_add | powershell.exe -NonInteractive -NoProfile - |
+                grep -av OK
             if [[ $? != 0 ]]; then # if route.exe add success
                 trap '
                     route_del |
