@@ -140,12 +140,14 @@ set_env(){
     WSL2_IP=$(hostname -I | cut -d' ' -f1)
 
     WIN_VIFIP=$(ip r s default | cut -d' ' -f3)
-    WIN_VIFID=$(arp.exe -a | grep "^I.*: $WIN_VIFIP" | awk '$0=strtonum($4)')
+    WIN_VIFID=$(arp.exe -a -N $WIN_VIFIP | grep -aoPm1 '0x[0-9a-f]+' |
+        awk '$0=strtonum($0)')
 
     GW_IP=$(route.exe print -4 | awk '$1=="0.0.0.0"{print $3}')
 
     WIN_IFIP=$(route.exe print -4 | awk '$1=="0.0.0.0"{print $4}')
-    WIN_IFID=$( arp.exe -a | grep "^I.*: $WIN_IFIP"  | awk '$0=strtonum($4)')
+    WIN_IFID=$(arp.exe -a -N $WIN_IFIP | grep -aoPm1 '0x[0-9a-f]+' |
+        awk '$0=strtonum($0)')
 
     #show WSL2_IP WIN_VIFID GW_IP WIN_IFID
 }
